@@ -26,7 +26,7 @@ spring:
     jackson:
         serialization.write_dates_as_timestamps: false
     cache:
-        type: none
+        type: simple
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
         url: jdbc:h2:mem:uaa;DB_CLOSE_DELAY=-1
@@ -49,14 +49,6 @@ spring:
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: true
             hibernate.hbm2ddl.auto: validate
-    data:
-        elasticsearch:
-            cluster-name:
-            cluster-nodes:
-            properties:
-                path:
-                    logs: target/elasticsearch/log
-                    data: target/elasticsearch/data
     mail:
         host: localhost
     messages:
@@ -69,13 +61,6 @@ spring:
 
 liquibase:
     contexts: test
-
-security:
-    basic:
-        enabled: false
-    oauth2:
-        resource:
-            filter-order: 3
 
 server:
     port: 10344
@@ -109,7 +94,7 @@ jhipster:
     security:
         authentication:
             jwt:
-                secret: 1b63836cf5dde135eee378ab441961b8d76f75a8
+                secret: c0d2996fe5414807e78cd3fa2f4f42e4aaefdb19
                 # Token is valid 24 hours
                 token-validity-in-seconds: 86400
         client-authorization:

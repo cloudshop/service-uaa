@@ -13,6 +13,12 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
+logging:
+    level:
+        ROOT: DEBUG
+        com.cloud.uaa: DEBUG
+        io.github.jhipster: DEBUG
+
 eureka:
     instance:
         prefer-ip-address: true
@@ -55,14 +61,6 @@ spring:
             hibernate.cache.hazelcast.instance_name: uaa
             hibernate.cache.use_minimal_puts: true
             hibernate.cache.hazelcast.use_lite_member: true
-    data:
-        elasticsearch:
-            cluster-name:
-            cluster-nodes:
-            properties:
-                path:
-                    logs: target/elasticsearch/log
-                    data: target/elasticsearch/data
     mail:
         host: localhost
         port: 25
@@ -96,8 +94,8 @@ liquibase:
 #    ssl:
 #        key-store: keystore.p12
 #        key-store-password: <your-password>
-#        keyStoreType: PKCS12
-#        keyAlias: uaa
+#        key-store-type: PKCS12
+#        key-alias: uaa
 # ===================================================================
 server:
     port: 9999
@@ -115,12 +113,16 @@ jhipster:
         hazelcast: # Hazelcast distributed cache
             time-to-live-seconds: 3600
             backup-count: 1
+            management-center: # Full reference is available at: http://docs.hazelcast.org/docs/management-center/3.9/manual/html/Deploying_and_Starting.html
+                enabled: false
+                update-interval: 3
+                url: http://localhost:8180/mancenter
     # CORS is only enabled by default with the "dev" profile, so BrowserSync can access the API
     cors:
         allowed-origins: "*"
         allowed-methods: "*"
         allowed-headers: "*"
-        exposed-headers: "Authorization"
+        exposed-headers: "Authorization,Link,X-Total-Count"
         allow-credentials: true
         max-age: 1800
     security:

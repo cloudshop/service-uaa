@@ -4,35 +4,35 @@
       "packageName": "com.cloud.uaa",
       "nativeLanguage": "zh-cn"
     },
-    "jhipsterVersion": "4.10.0",
+    "jhipsterVersion": "4.14.1",
     "baseName": "uaa",
     "packageName": "com.cloud.uaa",
     "packageFolder": "com/cloud/uaa",
     "serverPort": "9999",
     "authenticationType": "uaa",
-    "hibernateCache": "hazelcast",
-    "clusteredHttpSession": false,
+    "cacheProvider": "hazelcast",
+    "enableHibernateCache": true,
     "websocket": false,
     "databaseType": "sql",
     "devDatabaseType": "mysql",
     "prodDatabaseType": "mysql",
-    "searchEngine": "elasticsearch",
+    "searchEngine": false,
     "messageBroker": false,
     "serviceDiscoveryType": "eureka",
     "buildTool": "maven",
     "enableSocialSignIn": false,
     "enableSwaggerCodegen": false,
-    "jwtSecretKey": "1b63836cf5dde135eee378ab441961b8d76f75a8",
+    "jwtSecretKey": "c0d2996fe5414807e78cd3fa2f4f42e4aaefdb19",
     "enableTranslation": true,
     "applicationType": "uaa",
     "testFrameworks": [],
     "jhiPrefix": "jhi",
-    "skipClient": true,
     "nativeLanguage": "zh-cn",
     "languages": [
       "zh-cn",
       "en"
     ],
-    "clientPackageManager": "yarn"
+    "clientPackageManager": "yarn",
+    "skipClient": true
   }
 }
