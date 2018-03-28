@@ -357,6 +357,11 @@
             <artifactId>spring-security-data</artifactId>
         </dependency>
         <!-- jhipster-needle-maven-add-dependency -->
+        <dependency>
+            <groupId>com.eyun.client.springcloud</groupId>
+            <artifactId>verify</artifactId>
+            <version>0.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -639,6 +644,15 @@
             </plugins>
         </pluginManagement>
     </build>
+
+	<!-- 仓库管理 -->
+	<repositories>
+		<repository>
+			<id>eyun-nexus</id>
+			<url>http://dev.eyun.online:8081/repository/maven-releases</url>
+		</repository>
+	</repositories>
+        
     <profiles>
         <profile>
             <id>no-liquibase</id>

@@ -2,6 +2,9 @@ package com.cloud.uaa.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
+import io.swagger.client.ApiClient;
+import io.swagger.client.api.VerifyResourceApi;
+
 import com.cloud.uaa.domain.User;
 import com.cloud.uaa.repository.UserRepository;
 import com.cloud.uaa.security.SecurityUtils;
@@ -37,11 +40,14 @@ public class AccountResource {
 
     private final MailService mailService;
 
+    private VerifyResourceApi api;
+
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
 
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        api = new ApiClient().buildClient(VerifyResourceApi.class);
     }
 
     /**
@@ -56,6 +62,10 @@ public class AccountResource {
     @Timed
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+        if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
+            throw new InvalidPasswordException();
+        }
+    	
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
@@ -185,5 +195,12 @@ public class AccountResource {
         return !StringUtils.isEmpty(password) &&
             password.length() >= ManagedUserVM.PASSWORD_MIN_LENGTH &&
             password.length() <= ManagedUserVM.PASSWORD_MAX_LENGTH;
+    }
+    
+    private static boolean checkVerifyCode(String verifyCode) {
+    		
+        if (StringUtils.isEmpty(verifyCode)) return false;
+//        return api.smsValidateUsingPOST();
+        return true;
     }
 }
