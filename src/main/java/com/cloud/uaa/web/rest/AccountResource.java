@@ -6,11 +6,11 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.api.VerifyResourceApi;
 
 import com.cloud.uaa.domain.User;
-import com.cloud.uaa.feign.VerifyService;
 import com.cloud.uaa.repository.UserRepository;
 import com.cloud.uaa.security.SecurityUtils;
 import com.cloud.uaa.service.MailService;
 import com.cloud.uaa.service.UserService;
+import com.cloud.uaa.service.VerifyService;
 import com.cloud.uaa.service.dto.UserDTO;
 import com.cloud.uaa.web.rest.errors.*;
 import com.cloud.uaa.web.rest.vm.KeyAndPasswordVM;
@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -44,7 +46,7 @@ public class AccountResource {
 
     private VerifyResourceApi api;
     
-    @Autowired
+    //@Autowired
     private VerifyService verifyService;
 
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
@@ -74,8 +76,13 @@ public class AccountResource {
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
-        if (!managedUserVM.getVerifyCode().equals(verifyCode)) {
+        //String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
+        //if (!managedUserVM.getVerifyCode().equals(verifyCode)) {
+        //TODO 待修改feign
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> fe = restTemplate.getForEntity("http://localhost:8132/api/verify/"+managedUserVM.getLogin(),String.class);
+        
+        if (!managedUserVM.getVerifyCode().equals(fe.getBody())) {
         	throw new BadRequestAlertException("验证码错误，请重新输入！", "verifyService", "500");
         }
         userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
