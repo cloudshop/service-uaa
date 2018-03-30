@@ -6,6 +6,7 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.api.VerifyResourceApi;
 
 import com.cloud.uaa.domain.User;
+import com.cloud.uaa.feign.VerifyService;
 import com.cloud.uaa.repository.UserRepository;
 import com.cloud.uaa.security.SecurityUtils;
 import com.cloud.uaa.service.MailService;
@@ -18,6 +19,7 @@ import com.cloud.uaa.web.rest.vm.ManagedUserVM;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +43,9 @@ public class AccountResource {
     private final MailService mailService;
 
     private VerifyResourceApi api;
+    
+    @Autowired
+    private VerifyService verifyService;
 
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
 
@@ -68,6 +73,10 @@ public class AccountResource {
     	
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
+        }
+        String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
+        if (!managedUserVM.getVerifyCode().equals(verifyCode)) {
+        	throw new BadRequestAlertException("验证码错误，请重新输入！", "verifyService", "500");
         }
         userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
         userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
