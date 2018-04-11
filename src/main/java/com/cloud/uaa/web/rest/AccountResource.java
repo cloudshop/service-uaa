@@ -44,18 +44,14 @@ public class AccountResource {
 
     private final MailService mailService;
 
-    private VerifyResourceApi api;
-    
-    //@Autowired
+    @Autowired
     private VerifyService verifyService;
 
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
-
-        this.userRepository = userRepository;
-        this.userService = userService;
-        this.mailService = mailService;
-        api = new ApiClient().buildClient(VerifyResourceApi.class);
-    }
+		this.userRepository = userRepository;
+		this.userService = userService;
+		this.mailService = mailService;
+	}
 
     /**
      * POST  /register : register the user.
@@ -76,14 +72,12 @@ public class AccountResource {
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        //String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
-        //if (!managedUserVM.getVerifyCode().equals(verifyCode)) {
-        //TODO 待修改feign
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> fe = restTemplate.getForEntity("http://localhost:8132/api/verify/"+managedUserVM.getLogin(),String.class);
-        
-        if (!managedUserVM.getVerifyCode().equals(fe.getBody())) {
-        	throw new BadRequestAlertException("验证码错误，请重新输入！", "verifyService", "500");
+        String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
+        if (!managedUserVM.getVerifyCode().equals(verifyCode)) {
+//        RestTemplate restTemplate = new RestTemplate();
+//        ResponseEntity<String> fe = restTemplate.getForEntity("http://localhost:8132/api/verify/"+managedUserVM.getLogin(),String.class);
+//        if (!managedUserVM.getVerifyCode().equals(fe.getBody())) {
+        	throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
         }
         userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
         userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
