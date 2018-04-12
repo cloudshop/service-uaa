@@ -11,7 +11,10 @@ import com.cloud.uaa.security.SecurityUtils;
 import com.cloud.uaa.service.MailService;
 import com.cloud.uaa.service.UserService;
 import com.cloud.uaa.service.VerifyService;
+import com.cloud.uaa.service.WalletService;
+import com.cloud.uaa.service.dto.UpdatePasswordDTO;
 import com.cloud.uaa.service.dto.UserDTO;
+import com.cloud.uaa.service.dto.WalletDTO;
 import com.cloud.uaa.web.rest.errors.*;
 import com.cloud.uaa.web.rest.vm.KeyAndPasswordVM;
 import com.cloud.uaa.web.rest.vm.ManagedUserVM;
@@ -27,6 +30,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -46,6 +51,9 @@ public class AccountResource {
 
     @Autowired
     private VerifyService verifyService;
+    
+    @Autowired
+    private WalletService walletService;
 
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
 		this.userRepository = userRepository;
@@ -83,6 +91,33 @@ public class AccountResource {
         userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
         mailService.sendActivationEmail(user);
+    }
+    
+    @PostMapping("/app/register")
+    @Timed
+    @ResponseStatus(HttpStatus.CREATED)
+    public void registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    	if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
+    		throw new InvalidPasswordException();
+    	}
+    	
+    	if (!checkPasswordLength(managedUserVM.getPassword())) {
+    		throw new InvalidPasswordException();
+    	}
+    	String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
+    	if (!managedUserVM.getVerifyCode().equals(verifyCode)) {
+    		throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
+    	}
+    	userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
+    	userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
+    	User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
+    	//注册钱包 用户信息等
+    	WalletDTO walletDTO = new WalletDTO();
+    	walletDTO.setUserid(user.getId());
+    	walletDTO.setCreateTime(Instant.now());
+    	walletDTO.setUpdatedTime(Instant.now());
+    	walletService.createdWallet(walletDTO);
+    	//mailService.sendActivationEmail(user);
     }
 
     /**
@@ -164,6 +199,22 @@ public class AccountResource {
         }
         userService.changePassword(password);
    }
+    
+    @GetMapping(path = "/account/userlogin")
+    @Timed
+    public void updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
+    	if (!checkPasswordLength(updatePasswordDTO.getPassword())) {
+    		throw new InvalidPasswordException();
+    	}
+    	 SecurityUtils.getCurrentUserLogin()
+         .flatMap(userRepository::findOneByLogin)
+         .ifPresent(user -> {
+        	 System.out.println(user.getLogin());
+        	 //verifyService.getVerifyCodeByPhone(phone);
+         });
+    	//currentUserLogin.flatMap(mapper);
+    	//userService.changePassword(password);
+    }
 
     /**
      * POST   /account/reset-password/init : Send an email to reset the password of the user
