@@ -2,9 +2,6 @@ package com.cloud.uaa.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
-import io.swagger.client.ApiClient;
-import io.swagger.client.api.VerifyResourceApi;
-
 import com.cloud.uaa.domain.User;
 import com.cloud.uaa.repository.UserRepository;
 import com.cloud.uaa.security.SecurityUtils;
@@ -28,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
