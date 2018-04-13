@@ -102,13 +102,13 @@ public class AccountResource {
     		throw new InvalidPasswordException();
     	}
     	ResponseEntity<String> forEntity = new RestTemplate().getForEntity("http://cloud.eyun.online:9080/verify/api/verify/"+managedUserVM.getLogin(), String.class);
-    	String body = forEntity.getBody();
+    	String code = forEntity.getBody();
     	//String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
-//    	if (!managedUserVM.getVerifyCode().equals(verifyCode)) {
-//    		throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
-//    	}
+    	if (!managedUserVM.getVerifyCode().equals(code)) {
+    		throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
+    	}
     	userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
-    	userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
+    	//userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
     	User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
     	//注册钱包 用户信息等
     	WalletDTO walletDTO = new WalletDTO();
