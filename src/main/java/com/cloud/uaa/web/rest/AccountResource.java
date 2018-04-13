@@ -90,6 +90,14 @@ public class AccountResource {
         mailService.sendActivationEmail(user);
     }
     
+    /**
+     * app用户注册接口
+     * @author 逍遥子
+     * @email 756898059@qq.com
+     * @date 2018年4月13日
+     * @version 1.0
+     * @param managedUserVM
+     */
     @PostMapping("/register/app")
     @Timed
     @ResponseStatus(HttpStatus.CREATED)
@@ -109,14 +117,7 @@ public class AccountResource {
     	}
     	userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
     	//userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
-    	User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-    	//注册钱包 用户信息等
-    	WalletDTO walletDTO = new WalletDTO();
-    	walletDTO.setUserid(user.getId());
-    	walletDTO.setCreateTime(Instant.now());
-    	walletDTO.setUpdatedTime(Instant.now());
-    	//walletService.createdWallet(walletDTO);
-    	//mailService.sendActivationEmail(user);
+    	User user = userService.registerAppUser(managedUserVM, managedUserVM.getPassword());
     }
 
     /**

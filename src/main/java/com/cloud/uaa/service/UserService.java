@@ -117,6 +117,33 @@ public class UserService {
         log.debug("Created Information for User: {}", newUser);
         return newUser;
     }
+    
+    public User registerAppUser(UserDTO userDTO, String password) {
+    	
+    	User newUser = new User();
+    	Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
+    	Set<Authority> authorities = new HashSet<>();
+    	String encryptedPassword = passwordEncoder.encode(password);
+    	newUser.setLogin(userDTO.getLogin());
+    	// new user gets initially a generated password
+    	newUser.setPassword(encryptedPassword);
+//    	newUser.setFirstName(userDTO.getFirstName());
+//    	newUser.setLastName(userDTO.getLastName());
+//    	newUser.setEmail(userDTO.getEmail());
+//    	newUser.setImageUrl(userDTO.getImageUrl());
+//    	newUser.setLangKey(userDTO.getLangKey());
+    	// new user is not active
+    	newUser.setActivated(true);
+    	// new user gets registration key
+ //   	newUser.setActivationKey(RandomUtil.generateActivationKey());
+    	authorities.add(authority);
+    	newUser.setAuthorities(authorities);
+    	userRepository.save(newUser);
+    	cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(newUser.getLogin());
+    	cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(newUser.getEmail());
+    	log.debug("Created Information for User: {}", newUser);
+    	return newUser;
+    }
 
     public User createUser(UserDTO userDTO) {
         User user = new User();
