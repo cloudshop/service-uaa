@@ -28,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -93,7 +94,7 @@ public class AccountResource {
         mailService.sendActivationEmail(user);
     }
     
-    @PostMapping("/app/register")
+    @PostMapping("/register/app")
     @Timed
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
@@ -104,10 +105,12 @@ public class AccountResource {
     	if (!checkPasswordLength(managedUserVM.getPassword())) {
     		throw new InvalidPasswordException();
     	}
-    	String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
-    	if (!managedUserVM.getVerifyCode().equals(verifyCode)) {
-    		throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
-    	}
+    	ResponseEntity<String> forEntity = new RestTemplate().getForEntity("http://cloud.eyun.online:9080/verify/api/verify/"+managedUserVM.getLogin(), String.class);
+    	String body = forEntity.getBody();
+    	//String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
+//    	if (!managedUserVM.getVerifyCode().equals(verifyCode)) {
+//    		throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
+//    	}
     	userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
     	userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
     	User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
@@ -116,7 +119,7 @@ public class AccountResource {
     	walletDTO.setUserid(user.getId());
     	walletDTO.setCreateTime(Instant.now());
     	walletDTO.setUpdatedTime(Instant.now());
-    	walletService.createdWallet(walletDTO);
+    	//walletService.createdWallet(walletDTO);
     	//mailService.sendActivationEmail(user);
     }
 
