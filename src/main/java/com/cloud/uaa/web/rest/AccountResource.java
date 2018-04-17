@@ -100,7 +100,7 @@ public class AccountResource {
     @PostMapping("/register/app")
     @Timed
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    public ResponseEntity registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
     	if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
     		throw new InvalidPasswordException();
     	}
@@ -117,6 +117,7 @@ public class AccountResource {
     	userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
     	//userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
     	User user = userService.registerAppUser(managedUserVM, managedUserVM.getPassword());
+    	return ResponseEntity.ok().body(user);
     }
 
     /**
