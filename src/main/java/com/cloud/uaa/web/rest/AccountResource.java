@@ -48,7 +48,7 @@ public class AccountResource {
 
     @Autowired
     private VerifyService verifyService;
-    
+
     @Autowired
     private WalletService walletService;
 
@@ -73,7 +73,7 @@ public class AccountResource {
         if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
             throw new InvalidPasswordException();
         }
-    	
+
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
@@ -89,7 +89,7 @@ public class AccountResource {
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
         mailService.sendActivationEmail(user);
     }
-    
+
     /**
      * app用户注册接口
      * @author 逍遥子
@@ -105,16 +105,16 @@ public class AccountResource {
     	if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
     		throw new InvalidPasswordException();
     	}
-    	
+
     	if (!checkPasswordLength(managedUserVM.getPassword())) {
     		throw new InvalidPasswordException();
     	}
-    	ResponseEntity<String> forEntity = new RestTemplate().getForEntity("http://cloud.eyun.online:9080/verify/api/verify/"+managedUserVM.getLogin(), String.class);
+    	/*ResponseEntity<String> forEntity = new RestTemplate().getForEntity("http://cloud.eyun.online:9080/verify/api/verify/"+managedUserVM.getLogin(), String.class);
     	String code = forEntity.getBody();
     	//String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
     	if (!managedUserVM.getVerifyCode().equals(code)) {
     		throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
-    	}
+    	}*/
     	userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
     	//userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
     	User user = userService.registerAppUser(managedUserVM, managedUserVM.getPassword());
@@ -199,7 +199,7 @@ public class AccountResource {
         }
         userService.changePassword(password);
    }
-    
+
     @GetMapping(path = "/account/userlogin")
     @Timed
     public void updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
@@ -257,9 +257,9 @@ public class AccountResource {
             password.length() >= ManagedUserVM.PASSWORD_MIN_LENGTH &&
             password.length() <= ManagedUserVM.PASSWORD_MAX_LENGTH;
     }
-    
+
     private static boolean checkVerifyCode(String verifyCode) {
-    		
+
         if (StringUtils.isEmpty(verifyCode)) return false;
 //        return api.smsValidateUsingPOST();
         return true;
