@@ -70,10 +70,6 @@ public class AccountResource {
     @Timed
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
-        if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
-            throw new InvalidPasswordException();
-        }
-
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
