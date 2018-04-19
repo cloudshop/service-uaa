@@ -70,19 +70,9 @@ public class AccountResource {
     @Timed
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
-        // if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
-        //     throw new InvalidPasswordException();
-        // }
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-//         String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
-//         if (!managedUserVM.getVerifyCode().equals(verifyCode)) {
-// //        RestTemplate restTemplate = new RestTemplate();
-// //        ResponseEntity<String> fe = restTemplate.getForEntity("http://localhost:8132/api/verify/"+managedUserVM.getLogin(),String.class);
-// //        if (!managedUserVM.getVerifyCode().equals(fe.getBody())) {
-//         	throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
-//         }
         userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
         userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
@@ -100,7 +90,7 @@ public class AccountResource {
     @PostMapping("/register/app")
     @Timed
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    public void registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
     	if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
     		throw new InvalidPasswordException();
     	}
@@ -117,7 +107,6 @@ public class AccountResource {
     	userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
     	//userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
     	User user = userService.registerAppUser(managedUserVM, managedUserVM.getPassword());
-    	return ResponseEntity.ok().body(user);
     }
 
     /**
