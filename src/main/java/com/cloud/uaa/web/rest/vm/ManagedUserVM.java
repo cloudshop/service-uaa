@@ -16,6 +16,8 @@ public class ManagedUserVM extends UserDTO {
     private String password;
 
     private String verifyCode;
+    
+    private String inviterPhone;
 
     public ManagedUserVM() {
         // Empty constructor needed for Jackson.
@@ -41,5 +43,13 @@ public class ManagedUserVM extends UserDTO {
 
 	public void setVerifyCode(String verifyCode) {
 		this.verifyCode = verifyCode;
+	}
+
+	public String getInviterPhone() {
+		return inviterPhone;
+	}
+
+	public void setInviterPhone(String inviterPhone) {
+		this.inviterPhone = inviterPhone;
 	}
 }

@@ -249,6 +249,17 @@ public class UserService {
                 log.debug("Changed password for User: {}", user);
             });
     }
+    
+    public void updatePassword(String password,String login) {
+    	userRepository.findOneByLogin(login)
+    	.ifPresent(user -> {
+    		String encryptedPassword = passwordEncoder.encode(password);
+    		user.setPassword(encryptedPassword);
+    		cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).evict(user.getLogin());
+    		cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).evict(user.getEmail());
+    		log.debug("Changed password for User: {}", user);
+    	});
+    }
 
     @Transactional(readOnly = true)
     public Page<UserDTO> getAllManagedUsers(Pageable pageable) {

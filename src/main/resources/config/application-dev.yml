@@ -127,6 +127,8 @@ jhipster:
         max-age: 1800
     security:
         client-authorization:
+            access-token-uri: http://uaa/oauth/token
+            token-service-id: uaa
             client-id: internal
             client-secret: internal
     mail: # specific JHipster mail property, for standard properties see MailProperties
@@ -159,7 +161,7 @@ uaa:
         alias: selfsigned
     web-client-configuration:
         # Access Token is valid for 5 mins
-        access-token-validity-in-seconds: 300
+        access-token-validity-in-seconds: 10
         # Refresh Token is valid for 7 days
         refresh-token-validity-in-seconds-for-remember-me: 604800
         client-id: web_app

@@ -2,14 +2,18 @@ package com.cloud.uaa.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
+import io.swagger.annotations.ApiOperation;
+
 import com.cloud.uaa.domain.User;
 import com.cloud.uaa.repository.UserRepository;
 import com.cloud.uaa.security.SecurityUtils;
 import com.cloud.uaa.service.MailService;
+import com.cloud.uaa.service.UserClient;
 import com.cloud.uaa.service.UserService;
 import com.cloud.uaa.service.VerifyService;
 import com.cloud.uaa.service.WalletService;
 import com.cloud.uaa.service.dto.UpdatePasswordDTO;
+import com.cloud.uaa.service.dto.UserAnnexDTO;
 import com.cloud.uaa.service.dto.UserDTO;
 import com.cloud.uaa.service.dto.WalletDTO;
 import com.cloud.uaa.web.rest.errors.*;
@@ -51,6 +55,9 @@ public class AccountResource {
 
     @Autowired
     private WalletService walletService;
+    
+    @Autowired
+    private UserClient userClient;
 
     public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
 		this.userRepository = userRepository;
@@ -80,13 +87,25 @@ public class AccountResource {
     }
 
     /**
-     * app用户注册接口
+     * app用户修改密码
      * @author 逍遥子
      * @email 756898059@qq.com
      * @date 2018年4月13日
      * @version 1.0
      * @param managedUserVM
      */
+    @ApiOperation("app用户修改密码")
+    @PostMapping("/account/update-password")
+    @Timed
+    public void updatePasswordAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    	ResponseEntity<String> resp = verifyService.getVerifyLogin(managedUserVM.getLogin());
+    	String body = resp.getBody();
+    	if (!managedUserVM.getVerifyCode().equals(body)) {
+    		new BadRequestAlertException("验证码错误", "verifyCode", "verifyCodeError");
+    	}
+    	userService.updatePassword(managedUserVM.getPassword(), managedUserVM.getPassword());
+    }
+    
     @PostMapping("/register/app")
     @Timed
     @ResponseStatus(HttpStatus.CREATED)
@@ -94,19 +113,24 @@ public class AccountResource {
     	if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
     		throw new InvalidPasswordException();
     	}
-
+    	
     	if (!checkPasswordLength(managedUserVM.getPassword())) {
     		throw new InvalidPasswordException();
     	}
-    	ResponseEntity<String> forEntity = new RestTemplate().getForEntity("http://cloud.eyun.online:9080/verify/api/verify/"+managedUserVM.getLogin(), String.class);
-    	String code = forEntity.getBody();
-    	//String verifyCode = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
+    	//ResponseEntity<String> forEntity = new RestTemplate().getForEntity("http://cloud.eyun.online:9080/verify/api/verify/"+managedUserVM.getLogin(), String.class);
+    	String code = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
     	if (!managedUserVM.getVerifyCode().equals(code)) {
     		throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
     	}
+    	User inviterUser = userRepository.findOneByLogin(managedUserVM.getInviterPhone()).get();
     	userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
     	//userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
     	User user = userService.registerAppUser(managedUserVM, managedUserVM.getPassword());
+		//添加用户信息
+    	UserAnnexDTO userAnnexDTO = new UserAnnexDTO();
+    	userAnnexDTO.setUserid(user.getId());
+    	userAnnexDTO.setInviterId(inviterUser.getId());
+    	userClient.createUserAnnex(userAnnexDTO);
     }
 
     /**
