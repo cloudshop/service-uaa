@@ -117,14 +117,13 @@ public class AccountResource {
     	if (!checkPasswordLength(managedUserVM.getPassword())) {
     		throw new InvalidPasswordException();
     	}
-    	ResponseEntity<String> forEntity = new RestTemplate().getForEntity("http://cloud.eyun.online:9080/verify/api/verify/"+managedUserVM.getLogin(), String.class);
     	String code = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
     	if (!managedUserVM.getVerifyCode().equals(code)) {
     		throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
     	}
     	User inviterUser = null;
     	if (StringUtils.isNotBlank(managedUserVM.getInviterPhone())) {
-    		inviterUser = userRepository.findOneByLogin(managedUserVM.getInviterPhone()).get();
+			inviterUser = userRepository.findOneByLogin(managedUserVM.getInviterPhone()).orElseThrow(() -> new BadRequestAlertException("邀请人不存在", "inviterUser", "inviterUserNull"));
     	}
     	userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
     	//userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
