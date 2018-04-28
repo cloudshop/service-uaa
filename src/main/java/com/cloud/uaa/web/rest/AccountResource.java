@@ -119,7 +119,7 @@ public class AccountResource {
     	}
     	String code = verifyService.getVerifyCodeByPhone(managedUserVM.getLogin());
     	if (!managedUserVM.getVerifyCode().equals(code)) {
-    		throw new BadRequestAlertException("Verification code error, please re - enter!", "verifyService", "500");
+    		throw new BadRequestAlertException("验证码输入错误", "verifyService", "vcodeErr");
     	}
     	User inviterUser = null;
     	if (StringUtils.isNotBlank(managedUserVM.getInviterPhone())) {
