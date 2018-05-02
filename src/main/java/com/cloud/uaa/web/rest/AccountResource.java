@@ -3,8 +3,6 @@ package com.cloud.uaa.web.rest;
 import com.codahale.metrics.annotation.Timed;
 
 import io.swagger.annotations.ApiOperation;
-import io.undertow.util.BadRequestException;
-
 import com.cloud.uaa.domain.User;
 import com.cloud.uaa.repository.UserRepository;
 import com.cloud.uaa.security.SecurityUtils;
@@ -16,30 +14,21 @@ import com.cloud.uaa.service.WalletService;
 import com.cloud.uaa.service.dto.UpdatePasswordDTO;
 import com.cloud.uaa.service.dto.UserAnnexDTO;
 import com.cloud.uaa.service.dto.UserDTO;
-import com.cloud.uaa.service.dto.WalletDTO;
 import com.cloud.uaa.web.rest.errors.*;
 import com.cloud.uaa.web.rest.vm.KeyAndPasswordVM;
 import com.cloud.uaa.web.rest.vm.ManagedUserVM;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.*;
 
@@ -292,93 +281,4 @@ public class AccountResource {
         return true;
     }
     
-    /**
-     * 导入用户数据
-     * @author 逍遥子
-     * @email 756898059@qq.com
-     * @date 2018年5月2日
-     * @version 1.0
-     * @throws Exception
-     */
-    public void fun() throws Exception {
-    	Instant now = Instant.now();
-		File file = new File("C:\\development\\user.xlsx");
-		FileInputStream fileInputStream = new FileInputStream(file);
-		XSSFWorkbook xb = new XSSFWorkbook(fileInputStream);
-		XSSFSheet sheet = xb.getSheetAt(0);
-		for (Row row : sheet) {
-			int i = row.getRowNum();
-			if (row.getCell(1) != null) {
-				row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
-			}
-			if (row.getCell(2) != null) {
-				row.getCell(2).setCellType(Cell.CELL_TYPE_STRING);
-			}
-			if (row.getCell(3) != null) {
-				row.getCell(3).setCellType(Cell.CELL_TYPE_STRING);
-			}
-			if (row.getCell(5) != null) {
-				row.getCell(5).setCellType(Cell.CELL_TYPE_STRING);
-			}
-			UserDTO userDTO = new UserDTO();
-	    	userDTO.setLogin(row.getCell(2).getStringCellValue()); 
-			User user = userService.registerAppUser(userDTO, "123456");
-			
-			UserAnnexDTO userAnnexDTO = new UserAnnexDTO();
-			userAnnexDTO.setId(user.getId());
-			userAnnexDTO.setCreatedTime(now);
-			userAnnexDTO.setUpdatedTime(now);
-			userAnnexDTO.setPhone(user.getLogin());
-			userAnnexDTO.setNickname(row.getCell(1).getStringCellValue());
-			switch (row.getCell(5).getStringCellValue()) {
-			case "普通会员":
-				userAnnexDTO.setType(1);
-				break;
-			case "VIP会员":
-				userAnnexDTO.setType(2);
-				break;
-			case "普通商户":
-				userAnnexDTO.setType(3);
-				break;
-			case "增值商户":
-				userAnnexDTO.setType(4);
-				break;
-			case "服务商":
-				userAnnexDTO.setType(5);
-				break;
-			default:
-				throw new BadRequestException("null--");
-			}
-			if (row.getCell(4) != null) {
-				row.getCell(4).setCellType(Cell.CELL_TYPE_STRING);
-				Optional<User> optional = userService.getUserWithAuthoritiesByLogin(row.getCell(4).getStringCellValue());
-				if (optional.isPresent()) {
-					userAnnexDTO.setInviterId(optional.get().getId());
-				}
-			}
-			userClient.createUserAnnex(userAnnexDTO);
-			
-			WalletDTO walletDTO = new WalletDTO();
-			walletDTO.setUserid(user.getId());
-			walletDTO.setCreateTime(now);
-			walletDTO.setVersion(0);
-			walletDTO.setUpdatedTime(now);
-			walletDTO.setBalance(new BigDecimal(row.getCell(6).getNumericCellValue()));
-			walletDTO.setTicket(new BigDecimal(row.getCell(7).getNumericCellValue()));
-			walletDTO.setIntegral(new BigDecimal(row.getCell(8).getNumericCellValue()));
-			walletService.createdWallet(walletDTO);
-			
-			
-//			System.out.print(row.getCell(1)+"\t");//名称
-//			System.out.print(row.getCell(2).getStringCellValue()+"\t");//账号
-//			System.out.print(row.getCell(3)+"\t");//推荐人名称
-//			System.out.print(row.getCell(4)+"\t");//推荐人账号
-//			System.out.print(row.getCell(5)+"\t");//等级
-//			System.out.print(row.getCell(6)+"\t");//余额
-//			System.out.print(row.getCell(7)+"\t");//贡融卷
-//			System.out.print(row.getCell(8)+"\t\r");//贡融积分
-//			System.out.println("------------------------------");
-			
-		}
-    }
 }
