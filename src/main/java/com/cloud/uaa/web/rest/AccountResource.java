@@ -132,6 +132,7 @@ public class AccountResource {
 		userAnnexDTO.setCreatedTime(now);
 		userAnnexDTO.setUpdatedTime(now);
 		userAnnexDTO.setPhone(user.getLogin());
+		userAnnexDTO.setType(1);
     	userAnnexDTO.setInviterId(inviterUser == null ? null : inviterUser.getId());
     	userClient.createUserAnnex(userAnnexDTO);
     }
