@@ -82,6 +82,7 @@ public class UaaConfiguration extends AuthorizationServerConfigurerAdapter imple
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
+                .antMatchers("/api/account/update-password").permitAll()
                 .antMatchers("/api/register/app").permitAll()
                 .antMatchers("/api/register").permitAll()
                 .antMatchers("/api/activate").permitAll()
