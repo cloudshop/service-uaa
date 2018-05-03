@@ -100,7 +100,7 @@ public class AccountResource {
     	if (!managedUserVM.getVerifyCode().equals(body)) {
     		new BadRequestAlertException("验证码错误", "verifyCode", "verifyCodeError");
     	}
-    	userService.updatePassword(managedUserVM.getPassword(), managedUserVM.getPassword());
+    	userService.updatePassword(managedUserVM.getPassword(), managedUserVM.getLogin());
     }
     
     @PostMapping("/register/app")
