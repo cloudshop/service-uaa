@@ -31,6 +31,8 @@ public class UserAnnexDTO implements Serializable {
     private Instant updatedTime;
 
     private Integer type;
+    
+    private String typeString;
 
     private Long inviterId;
 
@@ -122,7 +124,15 @@ public class UserAnnexDTO implements Serializable {
         this.inviterId = inviterId;
     }
 
-    @Override
+    public String getTypeString() {
+		return typeString;
+	}
+
+	public void setTypeString(String typeString) {
+		this.typeString = typeString;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

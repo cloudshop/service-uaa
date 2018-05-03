@@ -133,6 +133,7 @@ public class AccountResource {
 		userAnnexDTO.setUpdatedTime(now);
 		userAnnexDTO.setPhone(user.getLogin());
 		userAnnexDTO.setType(1);
+		userAnnexDTO.setTypeString("普通会员");
     	userAnnexDTO.setInviterId(inviterUser == null ? null : inviterUser.getId());
     	userClient.createUserAnnex(userAnnexDTO);
     }
