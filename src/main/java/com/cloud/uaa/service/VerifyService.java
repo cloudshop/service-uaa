@@ -12,7 +12,7 @@ public interface VerifyService {
 	@GetMapping("/api/verify/{phone}")
 	public String getVerifyCodeByPhone(@PathVariable("phone") String phone);
 	
-	@GetMapping("/verify/login/{phone}")
+	@GetMapping("/api/verify/login/{phone}")
     public ResponseEntity<String> getVerifyLogin(@PathVariable("phone") String phone);
 	
 }
