@@ -160,8 +160,8 @@ uaa:
         password: password
         alias: selfsigned
     web-client-configuration:
-        # Access Token is valid for 5 mins
-        access-token-validity-in-seconds: 300
+        # Access Token is valid for 1 day
+        access-token-validity-in-seconds: 86400
         # Refresh Token is valid for 7 days
         refresh-token-validity-in-seconds-for-remember-me: 604800
         client-id: web_app
