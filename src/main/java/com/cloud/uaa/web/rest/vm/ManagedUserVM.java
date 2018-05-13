@@ -15,6 +15,10 @@ public class ManagedUserVM extends UserDTO {
     @Size(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH)
     private String password;
 
+    private String verifyCode;
+    
+    private String inviterPhone;
+
     public ManagedUserVM() {
         // Empty constructor needed for Jackson.
     }
@@ -32,4 +36,20 @@ public class ManagedUserVM extends UserDTO {
         return "ManagedUserVM{" +
             "} " + super.toString();
     }
+
+	public String getVerifyCode() {
+		return verifyCode;
+	}
+
+	public void setVerifyCode(String verifyCode) {
+		this.verifyCode = verifyCode;
+	}
+
+	public String getInviterPhone() {
+		return inviterPhone;
+	}
+
+	public void setInviterPhone(String inviterPhone) {
+		this.inviterPhone = inviterPhone;
+	}
 }

@@ -24,7 +24,7 @@ eureka:
         prefer-ip-address: true
     client:
         service-url:
-            defaultZone: http://admin:${jhipster.registry.password}@localhost:8761/eureka/
+            defaultZone: http://admin:${jhipster.registry.password}@192.168.1.10:8761/eureka/
 
 spring:
     profiles:
@@ -39,7 +39,7 @@ spring:
         serialization.indent_output: true
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:mysql://localhost:3306/uaa?useUnicode=true&characterEncoding=utf8&useSSL=false
+        url: jdbc:mysql://192.168.1.10:3306/uaa?useUnicode=true&characterEncoding=utf8&useSSL=false
         username: root
         password: z7eh9n6tvk1fPUB8
         hikari:
@@ -127,6 +127,8 @@ jhipster:
         max-age: 1800
     security:
         client-authorization:
+            access-token-uri: http://uaa/oauth/token
+            token-service-id: uaa
             client-id: internal
             client-secret: internal
     mail: # specific JHipster mail property, for standard properties see MailProperties
@@ -158,8 +160,8 @@ uaa:
         password: password
         alias: selfsigned
     web-client-configuration:
-        # Access Token is valid for 5 mins
-        access-token-validity-in-seconds: 300
+        # Access Token is valid for 1 day
+        access-token-validity-in-seconds: 86400
         # Refresh Token is valid for 7 days
         refresh-token-validity-in-seconds-for-remember-me: 604800
         client-id: web_app

@@ -357,6 +357,19 @@
             <artifactId>spring-security-data</artifactId>
         </dependency>
         <!-- jhipster-needle-maven-add-dependency -->
+        
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->  
+		<dependency>  
+		    <groupId>org.apache.poi</groupId>  
+		    <artifactId>poi</artifactId>  
+		    <version>3.14</version>  
+		</dependency>  
+		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->  
+		<dependency>  
+		    <groupId>org.apache.poi</groupId>  
+		    <artifactId>poi-ooxml</artifactId>  
+		    <version>3.14</version>  
+		</dependency>  
     </dependencies>
 
     <build>
@@ -639,6 +652,15 @@
             </plugins>
         </pluginManagement>
     </build>
+
+	<!-- 仓库管理 -->
+	<repositories>
+		<repository>
+			<id>eyun-nexus</id>
+			<url>http://dev.eyun.online:8081/repository/maven-releases</url>
+		</repository>
+	</repositories>
+        
     <profiles>
         <profile>
             <id>no-liquibase</id>
