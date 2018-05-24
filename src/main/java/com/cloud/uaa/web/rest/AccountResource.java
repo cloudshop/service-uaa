@@ -52,7 +52,7 @@ public class AccountResource {
 
     @Autowired
     private WalletService walletService;
-    
+
     @Autowired
     private UserClient userClient;
 
@@ -102,15 +102,15 @@ public class AccountResource {
     	}
     	userService.updatePassword(managedUserVM.getPassword(), managedUserVM.getLogin());
     }
-    
+
     @PostMapping("/register/app")
     @Timed
-    @ResponseStatus(HttpStatus.CREATED)
+    //@ResponseStatus(HttpStatus.CREATED)
     public void registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
     	if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
     		throw new InvalidPasswordException();
     	}
-    	
+
     	if (!checkPasswordLength(managedUserVM.getPassword())) {
     		throw new InvalidPasswordException();
     	}
@@ -282,5 +282,5 @@ public class AccountResource {
 //        return api.smsValidateUsingPOST();
         return true;
     }
-    
+
 }
