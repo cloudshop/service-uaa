@@ -106,7 +106,7 @@ public class AccountResource {
     @PostMapping("/register/app")
     @Timed
     //@ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<UserAnnexDTO> registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    public ResponseEntity registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) throws Exception{
     	if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
     		throw new InvalidPasswordException();
     	}
