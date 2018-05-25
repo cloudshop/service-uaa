@@ -105,8 +105,8 @@ public class AccountResource {
 
     @PostMapping("/register/app")
     @Timed
-    //@ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) throws Exception{
+    @ResponseStatus(HttpStatus.CREATED)
+    public void registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
     	if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
     		throw new InvalidPasswordException();
     	}
@@ -135,7 +135,7 @@ public class AccountResource {
 		userAnnexDTO.setType(1);
 		userAnnexDTO.setTypeString("普通会员");
     	userAnnexDTO.setInviterId(inviterUser == null ? null : inviterUser.getId());
-    	return userClient.createUserAnnex(userAnnexDTO);
+    	userClient.createUserAnnex(userAnnexDTO);
     }
 
     /**
