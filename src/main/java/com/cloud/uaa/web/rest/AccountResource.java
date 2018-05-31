@@ -5,6 +5,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.ApiOperation;
 import com.cloud.uaa.domain.User;
 import com.cloud.uaa.repository.UserRepository;
+import com.cloud.uaa.security.DomainUserDetailsService;
 import com.cloud.uaa.security.SecurityUtils;
 import com.cloud.uaa.service.MailService;
 import com.cloud.uaa.service.UserClient;
@@ -24,9 +25,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import java.time.Instant;
@@ -106,7 +109,7 @@ public class AccountResource {
     @PostMapping("/register/app")
     @Timed
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    public void registerAppAccount(@Valid @RequestBody ManagedUserVM managedUserVM,HttpServletResponse httpServletResponse) {
     	if (!checkVerifyCode(managedUserVM.getVerifyCode())) {
     		throw new InvalidPasswordException();
     	}
@@ -136,6 +139,7 @@ public class AccountResource {
 		userAnnexDTO.setTypeString("普通会员");
     	userAnnexDTO.setInviterId(inviterUser == null ? null : inviterUser.getId());
     	userClient.createUserAnnex(userAnnexDTO);
+    	httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
     }
 
     /**
