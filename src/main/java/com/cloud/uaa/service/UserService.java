@@ -270,6 +270,11 @@ public class UserService {
     public Optional<User> getUserWithAuthoritiesByLogin(String login) {
         return userRepository.findOneWithAuthoritiesByLogin(login);
     }
+    
+    @Transactional(readOnly = true)
+    public Optional<User> getUserByWechatUnionid(String wechatUnionid) {
+    	return userRepository.findOneByWechatUnionid(wechatUnionid);
+    }
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities(Long id) {

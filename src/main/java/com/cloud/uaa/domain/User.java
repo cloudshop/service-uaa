@@ -83,6 +83,9 @@ public class User extends AbstractAuditingEntity implements Serializable {
 
     @Column(name = "reset_date")
     private Instant resetDate = null;
+    
+    @Column(name = "wechat_unionid")
+    private String wechatUnionid;
 
     @JsonIgnore
     @ManyToMany
@@ -199,7 +202,15 @@ public class User extends AbstractAuditingEntity implements Serializable {
         this.authorities = authorities;
     }
 
-    @Override
+    public String getWechatUnionid() {
+		return wechatUnionid;
+	}
+
+	public void setWechatUnionid(String wechatUnionid) {
+		this.wechatUnionid = wechatUnionid;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -228,6 +239,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
             ", activated='" + activated + '\'' +
             ", langKey='" + langKey + '\'' +
             ", activationKey='" + activationKey + '\'' +
+            ", wechatUnionid='" + wechatUnionid + '\'' +
             "}";
     }
 }

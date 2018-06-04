@@ -1,6 +1,8 @@
 package com.cloud.uaa.config;
 
 import com.cloud.uaa.security.AuthoritiesConstants;
+import com.cloud.uaa.wxlogin.WechatSecurityConfigurer;
+
 import io.github.jhipster.config.JHipsterProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,10 +66,13 @@ public class UaaConfiguration extends AuthorizationServerConfigurerAdapter imple
             this.jHipsterProperties = jHipsterProperties;
             this.corsFilter = corsFilter;
         }
+        
+        @Autowired
+        private WechatSecurityConfigurer wechatSecurityConfigurer;
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-            http
+        	http
                 .exceptionHandling()
                 .authenticationEntryPoint((request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
             .and()
@@ -95,7 +100,9 @@ public class UaaConfiguration extends AuthorizationServerConfigurerAdapter imple
                 .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
                 .antMatchers("/v2/api-docs/**").permitAll()
                 .antMatchers("/swagger-resources/configuration/ui").permitAll()
-                .antMatchers("/swagger-ui/index.html").hasAuthority(AuthoritiesConstants.ADMIN);
+                .antMatchers("/swagger-ui/index.html").hasAuthority(AuthoritiesConstants.ADMIN)
+            .and()
+                .apply(wechatSecurityConfigurer);
         }
 
         @Override
@@ -137,7 +144,8 @@ public class UaaConfiguration extends AuthorizationServerConfigurerAdapter imple
             .autoApprove(true)
             .authorizedGrantTypes("client_credentials")
             .accessTokenValiditySeconds((int) jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSeconds())
-            .refreshTokenValiditySeconds((int) jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSecondsForRememberMe());
+            .refreshTokenValiditySeconds((int) jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSecondsForRememberMe())
+            .and();
     }
 
     @Override
@@ -185,7 +193,8 @@ public class UaaConfiguration extends AuthorizationServerConfigurerAdapter imple
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-        oauthServer.tokenKeyAccess("permitAll()").checkTokenAccess(
-                "isAuthenticated()");
+        oauthServer
+        	.tokenKeyAccess("permitAll()")
+        	.checkTokenAccess("isAuthenticated()");
     }
 }
